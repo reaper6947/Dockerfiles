@@ -1,0 +1,31 @@
+FROM ubuntu:jammy
+
+ARG TERM
+ARG SHELL
+ARG FOLDER
+ARG USERNAME=repr
+ARG HOSTNAME test-pc
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install --no-install-recommends -yq nano \
+        zsh curl sudo
+
+RUN apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+ENV TERM xterm-256color
+ENV SHELL=/bin/zsh
+
+RUN adduser --disabled-password --gecos '' $USERNAME    && \
+    adduser $USERNAME sudo                              && \
+    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
+    usermod --shell /bin/zsh $USERNAME
+
+
+RUN touch /home/${USERNAME}/.zshrc
+
+USER ${USERNAME}
+
+WORKDIR /home/${USERNAME}
+
+CMD ["zsh", "-i", "-l"]
